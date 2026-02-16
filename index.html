@@ -240,9 +240,9 @@
   }
 
   .reveal-photo {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
+    width: 90%;
+    max-width: 360px;
+    border-radius: 20px;
     object-fit: cover;
     border: 4px solid #ffd700;
     box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
@@ -295,7 +295,7 @@
 <div id="welcome-screen" class="screen active">
   <div class="welcome-emoji">🤔</div>
   <h1 class="welcome-title">Hey Owen...<br>Think you know yourself?</h1>
-  <p class="welcome-sub">9 questions. Some easy, some tricky.<br>Tap below to find out how well you really know your own life.</p>
+  <p class="welcome-sub">10 questions. Some easy, some tricky.<br>Tap below to find out how well you really know your own life.</p>
   <button class="btn btn-start" onclick="startQuiz()">Let's Go</button>
 </div>
 
@@ -314,7 +314,7 @@
 <div id="reveal-screen" class="screen">
   <canvas id="confetti"></canvas>
   <div class="reveal-content">
-    <img src="owen.jpg" alt="Owen" class="reveal-photo">
+    <img src="owen_family_snap_2026.jpg" alt="The family" class="reveal-photo">
     <h1 class="reveal-title">HAPPY 39TH BIRTHDAY<br>OWEN!</h1>
     <p class="reveal-subtitle">February 16, 2026</p>
     <div class="reveal-score" id="score-text"></div>
@@ -346,13 +346,21 @@ const questions = [
     q: "Which of these legends was also born in 1987?",
     options: ["Cristiano Ronaldo", "Lionel Messi", "LeBron James", "Usain Bolt"],
     answer: 1,
-    fact: "Messi! You're in good company. Well... he has a few more trophies than you. \ud83c\udfc6"
+    fact: "Messi! You're in good company. Well... he has a few more trophies than you. \ud83c\udfc6",
+    media: { type: "image", src: "owen_golf_dad.jpg" }
   },
   {
     q: "How many days old are you today?",
     options: ["11,420", "14,245", "12,876", "15,330"],
     answer: 1,
     fact: "14,245 days. Every single one of them leading to this moment. \ud83e\udd2f"
+  },
+  {
+    q: "Which Scottish course is known as the 'Home of Golf'?",
+    options: ["Carnoustie", "Royal Troon", "St Andrews", "Muirfield"],
+    answer: 2,
+    fact: "St Andrews! The Old Course. Here's your form on the course though...",
+    media: { type: "video", src: "owen_golf_scuffed.mp4" }
   },
   {
     q: "In World of Warcraft, what is the name of the Lich King?",
@@ -369,17 +377,18 @@ const questions = [
     media: { type: "video", src: "owen_pool.mp4" }
   },
   {
+    q: "What is the term for three under par on a single hole?",
+    options: ["Eagle", "Double Birdie", "Albatross", "Condor"],
+    answer: 2,
+    fact: "An albatross! Extremely rare. Unlike this beauty of a shot...",
+    media: { type: "video", src: "owen_golf_goodshot.mp4" }
+  },
+  {
     q: "Owen, Sam, and Caleb walk into a bar. What happens next?",
     options: ["Owen orders a pint", "Caleb causes chaos", "Sam apologises for both of them", "All of the above"],
     answer: 3,
     fact: "All of the above, obviously. What a team those three are. \u2764\ufe0f",
-    media: { type: "image", src: "owen_family_snap_2026.jpg" }
-  },
-  {
-    q: "At 39, you're officially closer to...",
-    options: ["Your 20s", "A mid-life crisis", "Retirement", "Your prime"],
-    answer: 1,
-    fact: "Trick question \u2014 ALL of these are arguably correct. \ud83d\ude02"
+    media: { type: "image", src: "caleb_closeup.jpg" }
   },
   {
     q: "What's the meaning of life, the universe, and everything?",
@@ -471,7 +480,7 @@ function nextQuestion() {
 function getScoreComment(s) {
   const total = questions.length;
   if (s === total) return `You got ${s}/${total} \u2014 Perfect score! You absolute legend.`;
-  if (s >= 6) return `You got ${s}/${total} \u2014 Not bad! You mostly know your stuff.`;
+  if (s >= 7) return `You got ${s}/${total} \u2014 Not bad! You mostly know your stuff.`;
   if (s >= 4) return `You got ${s}/${total} \u2014 Could be worse... could be better.`;
   return `You got ${s}/${total} \u2014 Wow. Do you even know yourself, Owen?`;
 }
