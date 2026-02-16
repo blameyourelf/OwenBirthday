@@ -56,7 +56,15 @@
   }
 
   /* Welcome Screen */
-  .welcome-emoji { font-size: 3.5rem; margin-bottom: 1rem; }
+  .welcome-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    margin-bottom: 1.2rem;
+  }
 
   .welcome-title {
     font-size: 1.8rem;
@@ -298,7 +306,7 @@
 
 <!-- Welcome Screen -->
 <div id="welcome-screen" class="screen active">
-  <div class="welcome-emoji">🤔</div>
+  <img src="owen_closeup.png" alt="Owen" class="welcome-photo">
   <h1 class="welcome-title">Hey Owen...<br>Think you know yourself?</h1>
   <p class="welcome-sub">10 questions. Some easy, some tricky.<br>Tap below to find out how well you really know your own life.</p>
   <button class="btn btn-start" onclick="startQuiz()">Let's Go</button>
