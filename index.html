@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>A Special Quiz</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #1a1040;
+    color: #fff;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.08); }
+    70% { transform: scale(0.95); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  /* Welcome Screen */
+  .welcome-emoji { font-size: 3.5rem; margin-bottom: 1rem; }
+
+  .welcome-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .welcome-sub {
+    font-size: 1.1rem;
+    color: #b8a9d4;
+    margin-bottom: 2.5rem;
+    line-height: 1.5;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .btn:active { transform: scale(0.95); }
+
+  .btn-start {
+    background: linear-gradient(135deg, #ffd700, #f0a500);
+    color: #1a1040;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+  }
+
+  .btn-next {
+    background: linear-gradient(135deg, #ffd700, #f0a500);
+    color: #1a1040;
+    padding: 0.8rem 2.5rem;
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+  }
+
+  /* Quiz Screen */
+  .progress-bar {
+    width: 100%;
+    max-width: 400px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #f0a500);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .question-count {
+    font-size: 0.85rem;
+    color: #8a7bab;
+    margin-bottom: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .question-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1.8rem;
+    max-width: 500px;
+  }
+
+  .options { width: 100%; max-width: 400px; }
+
+  .option-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.7rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .option-btn:active { transform: scale(0.98); }
+
+  .option-btn.correct {
+    background: rgba(46, 204, 113, 0.2);
+    border-color: #2ecc71;
+    color: #2ecc71;
+  }
+
+  .option-btn.wrong {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+    color: #e74c3c;
+  }
+
+  .option-btn.reveal-correct {
+    background: rgba(46, 204, 113, 0.15);
+    border-color: #2ecc71;
+  }
+
+  .option-btn.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .feedback {
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 400px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .feedback.correct-feedback {
+    background: rgba(46, 204, 113, 0.12);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    color: #7ddfaa;
+  }
+
+  .feedback.wrong-feedback {
+    background: rgba(231, 76, 60, 0.12);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    color: #f1a9a0;
+  }
+
+  /* Reveal Screen */
+  #reveal-screen { padding: 2rem 1.5rem 3rem; }
+
+  canvas#confetti {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .reveal-content {
+    position: relative;
+    z-index: 11;
+    animation: bounceIn 0.8s ease;
+  }
+
+  .reveal-photo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #ffd700;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+    margin-bottom: 1.5rem;
+  }
+
+  .reveal-title {
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #ffd700, #ffaa00, #ff8c00);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 2s linear infinite;
+  }
+
+  .reveal-subtitle {
+    font-size: 1.1rem;
+    color: #b8a9d4;
+    margin-bottom: 1.5rem;
+  }
+
+  .reveal-score {
+    font-size: 1rem;
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    border-radius: 12px;
+    padding: 0.8rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .reveal-message {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #d4c6ef;
+    max-width: 360px;
+    margin-bottom: 1.5rem;
+  }
+
+  .reveal-party { font-size: 2.5rem; animation: pulse 1s ease infinite; }
+</style>
+</head>
+<body>
+
+<!-- Welcome Screen -->
+<div id="welcome-screen" class="screen active">
+  <div class="welcome-emoji">🤔</div>
+  <h1 class="welcome-title">Hey Owen...<br>Think you know yourself?</h1>
+  <p class="welcome-sub">7 questions. Some easy, some tricky.<br>Tap below to find out how well you really know your own life.</p>
+  <button class="btn btn-start" onclick="startQuiz()">Let's Go</button>
+</div>
+
+<!-- Quiz Screen -->
+<div id="quiz-screen" class="screen">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-count" id="question-count"></div>
+  <div class="question-text" id="question-text"></div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback" style="display:none"></div>
+  <button class="btn btn-next" id="next-btn" style="display:none" onclick="nextQuestion()">Next</button>
+</div>
+
+<!-- Reveal Screen -->
+<div id="reveal-screen" class="screen">
+  <canvas id="confetti"></canvas>
+  <div class="reveal-content">
+    <img src="owen.jpg" alt="Owen" class="reveal-photo">
+    <h1 class="reveal-title">HAPPY 39TH BIRTHDAY<br>OWEN!</h1>
+    <p class="reveal-subtitle">February 16, 2026</p>
+    <div class="reveal-score" id="score-text"></div>
+    <p class="reveal-message">
+      Here's to 39 incredible years of being you. Another trip around the sun, another year of
+      questionable decisions and unforgettable memories. We love you, mate. Now go celebrate! 🍻
+    </p>
+    <div class="reveal-party">🎉🎂🎉</div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "What was the #1 movie at the box office the year you graced the world with your presence?",
+    options: ["Dirty Dancing", "Three Men and a Baby", "The Princess Bride", "RoboCop"],
+    answer: 1,
+    fact: "Three Men and a Baby \u2014 appropriate, since you've basically been a big baby ever since. 👶"
+  },
+  {
+    q: "How many days old are you today?",
+    options: ["11,420", "14,245", "12,876", "15,330"],
+    answer: 1,
+    fact: "14,245 days. Every single one of them leading to this moment. 🤯"
+  },
+  {
+    q: "39 in Roman numerals is...",
+    options: ["XXIX", "XLIV", "XXXIX", "XXXIV"],
+    answer: 2,
+    fact: "XXXIX \u2014 looks fancy, almost distracts from the fact you're nearly 40. 👀"
+  },
+  {
+    q: "Which of these legends was also born in 1987?",
+    options: ["Cristiano Ronaldo", "Lionel Messi", "LeBron James", "Usain Bolt"],
+    answer: 1,
+    fact: "Messi! You're in good company. Well... he has a few more trophies than you. 🏆"
+  },
+  {
+    q: "Rick Astley released 'Never Gonna Give You Up' in 1987. How old was he?",
+    options: ["17", "19", "21", "23"],
+    answer: 2,
+    fact: "21! And we're never gonna give you up either, Owen. 🎵"
+  },
+  {
+    q: "At 39, you're officially closer to...",
+    options: ["Your 20s", "A mid-life crisis", "Retirement", "Your prime"],
+    answer: 1,
+    fact: "Trick question \u2014 ALL of these are arguably correct. 😂"
+  },
+  {
+    q: "What's the meaning of life, the universe, and everything?",
+    options: ["39", "40", "42", "Love"],
+    answer: 2,
+    fact: "42. You've got 3 more years to figure it all out. 🌌"
+  }
+];
+
+let current = 0;
+let score = 0;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  current = 0;
+  score = 0;
+  showScreen('quiz-screen');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('progress').style.width = ((current / questions.length) * 100) + '%';
+  document.getElementById('question-count').textContent = `Question ${current + 1} of ${questions.length}`;
+  document.getElementById('question-text').textContent = q.q;
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+
+  const optionsEl = document.getElementById('options');
+  optionsEl.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(index) {
+  const q = questions[current];
+  const buttons = document.querySelectorAll('.option-btn');
+  const isCorrect = index === q.answer;
+
+  if (isCorrect) score++;
+
+  buttons.forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === q.answer) btn.classList.add('correct');
+    if (i === index && !isCorrect) btn.classList.add('wrong');
+  });
+
+  const feedback = document.getElementById('feedback');
+  feedback.textContent = q.fact;
+  feedback.className = 'feedback ' + (isCorrect ? 'correct-feedback' : 'wrong-feedback');
+  feedback.style.display = 'block';
+
+  document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  current++;
+  if (current < questions.length) {
+    showScreen('quiz-screen');
+    renderQuestion();
+  } else {
+    showReveal();
+  }
+}
+
+function getScoreComment(s) {
+  if (s === 7) return `You got ${s}/7 — Perfect score! You absolute legend.`;
+  if (s >= 5) return `You got ${s}/7 — Not bad! You mostly know your stuff.`;
+  if (s >= 3) return `You got ${s}/7 — Could be worse... could be better.`;
+  return `You got ${s}/7 — Wow. Do you even know yourself, Owen?`;
+}
+
+function showReveal() {
+  document.getElementById('score-text').textContent = getScoreComment(score);
+  showScreen('reveal-screen');
+  startConfetti();
+}
+
+// Confetti
+function startConfetti() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#ffd700', '#ff6b6b', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#01a3a4', '#f368e0'];
+  const pieces = [];
+
+  for (let i = 0; i < 150; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: Math.random() * 10 + 5,
+      h: Math.random() * 6 + 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vy: Math.random() * 3 + 2,
+      vx: Math.random() * 2 - 1,
+      rot: Math.random() * 360,
+      rv: Math.random() * 6 - 3
+    });
+  }
+
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+      p.y += p.vy;
+      p.x += p.vx;
+      p.rot += p.rv;
+      if (p.y > canvas.height + 20) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+    frame++;
+    if (frame < 400) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  draw();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+}
+</script>
+</body>
+</html>
