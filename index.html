@@ -104,6 +104,8 @@
   }
 
   /* Quiz Screen */
+  #quiz-screen { justify-content: flex-start; padding-top: 3rem; }
+
   .progress-bar {
     width: 100%;
     max-width: 400px;
@@ -171,11 +173,6 @@
     color: #e74c3c;
   }
 
-  .option-btn.reveal-correct {
-    background: rgba(46, 204, 113, 0.15);
-    border-color: #2ecc71;
-  }
-
   .option-btn.disabled {
     pointer-events: none;
     opacity: 0.6;
@@ -201,6 +198,28 @@
     background: rgba(231, 76, 60, 0.12);
     border: 1px solid rgba(231, 76, 60, 0.3);
     color: #f1a9a0;
+  }
+
+  /* Media shown after answering */
+  .question-media {
+    margin-top: 1.2rem;
+    animation: fadeIn 0.5s ease;
+    max-width: 320px;
+    width: 100%;
+  }
+
+  .question-media img {
+    width: 100%;
+    border-radius: 16px;
+    border: 3px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .question-media video {
+    width: 100%;
+    border-radius: 16px;
+    border: 3px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   }
 
   /* Reveal Screen */
@@ -276,7 +295,7 @@
 <div id="welcome-screen" class="screen active">
   <div class="welcome-emoji">🤔</div>
   <h1 class="welcome-title">Hey Owen...<br>Think you know yourself?</h1>
-  <p class="welcome-sub">7 questions. Some easy, some tricky.<br>Tap below to find out how well you really know your own life.</p>
+  <p class="welcome-sub">9 questions. Some easy, some tricky.<br>Tap below to find out how well you really know your own life.</p>
   <button class="btn btn-start" onclick="startQuiz()">Let's Go</button>
 </div>
 
@@ -287,6 +306,7 @@
   <div class="question-text" id="question-text"></div>
   <div class="options" id="options"></div>
   <div class="feedback" id="feedback" style="display:none"></div>
+  <div class="question-media" id="question-media" style="display:none"></div>
   <button class="btn btn-next" id="next-btn" style="display:none" onclick="nextQuestion()">Next</button>
 </div>
 
@@ -299,8 +319,8 @@
     <p class="reveal-subtitle">February 16, 2026</p>
     <div class="reveal-score" id="score-text"></div>
     <p class="reveal-message">
-      Here's to 39 incredible years of being you. Another trip around the sun, another year of
-      questionable decisions and unforgettable memories. We love you, mate. Now go celebrate! 🍻
+      Here's to 39 incredible years of being you. Another trip around the sun
+      with Sam and Caleb by your side. We love you, Owen. Now go celebrate!
     </p>
     <div class="reveal-party">🎉🎂🎉</div>
   </div>
@@ -312,43 +332,60 @@ const questions = [
     q: "What was the #1 movie at the box office the year you graced the world with your presence?",
     options: ["Dirty Dancing", "Three Men and a Baby", "The Princess Bride", "RoboCop"],
     answer: 1,
-    fact: "Three Men and a Baby \u2014 appropriate, since you've basically been a big baby ever since. 👶"
+    fact: "Three Men and a Baby \u2014 appropriate, since you've basically been a big baby ever since. \ud83d\udc76",
+    media: { type: "image", src: "owen_seanair_neilston.jpg" }
   },
   {
-    q: "How many days old are you today?",
-    options: ["11,420", "14,245", "12,876", "15,330"],
+    q: "Which WWF superstar's finishing move was 'The Tombstone Piledriver'?",
+    options: ["Bret 'The Hitman' Hart", "The Undertaker", "Shawn Michaels", "Hulk Hogan"],
     answer: 1,
-    fact: "14,245 days. Every single one of them leading to this moment. 🤯"
-  },
-  {
-    q: "39 in Roman numerals is...",
-    options: ["XXIX", "XLIV", "XXXIX", "XXXIV"],
-    answer: 2,
-    fact: "XXXIX \u2014 looks fancy, almost distracts from the fact you're nearly 40. 👀"
+    fact: "The Undertaker! Those early 90s WWF days were legendary. Rest. In. Peace. \u26b0\ufe0f",
+    media: { type: "image", src: "owen_sam_crookston.jpg" }
   },
   {
     q: "Which of these legends was also born in 1987?",
     options: ["Cristiano Ronaldo", "Lionel Messi", "LeBron James", "Usain Bolt"],
     answer: 1,
-    fact: "Messi! You're in good company. Well... he has a few more trophies than you. 🏆"
+    fact: "Messi! You're in good company. Well... he has a few more trophies than you. \ud83c\udfc6"
   },
   {
-    q: "Rick Astley released 'Never Gonna Give You Up' in 1987. How old was he?",
-    options: ["17", "19", "21", "23"],
+    q: "How many days old are you today?",
+    options: ["11,420", "14,245", "12,876", "15,330"],
+    answer: 1,
+    fact: "14,245 days. Every single one of them leading to this moment. \ud83e\udd2f"
+  },
+  {
+    q: "In World of Warcraft, what is the name of the Lich King?",
+    options: ["Illidan", "Thrall", "Arthas", "Sylvanas"],
     answer: 2,
-    fact: "21! And we're never gonna give you up either, Owen. 🎵"
+    fact: "Arthas Menethil! Bet you spent more than a few late nights in Azeroth... \u2694\ufe0f",
+    media: { type: "image", src: "owen_sam_finlay.png" }
+  },
+  {
+    q: "What is the maximum break possible in a frame of snooker?",
+    options: ["140", "147", "155", "160"],
+    answer: 1,
+    fact: "147! The perfect break. Speaking of your skills at the table...",
+    media: { type: "video", src: "owen_pool.mp4" }
+  },
+  {
+    q: "Owen, Sam, and Caleb walk into a bar. What happens next?",
+    options: ["Owen orders a pint", "Caleb causes chaos", "Sam apologises for both of them", "All of the above"],
+    answer: 3,
+    fact: "All of the above, obviously. What a team those three are. \u2764\ufe0f",
+    media: { type: "image", src: "owen_family_snap_2026.jpg" }
   },
   {
     q: "At 39, you're officially closer to...",
     options: ["Your 20s", "A mid-life crisis", "Retirement", "Your prime"],
     answer: 1,
-    fact: "Trick question \u2014 ALL of these are arguably correct. 😂"
+    fact: "Trick question \u2014 ALL of these are arguably correct. \ud83d\ude02"
   },
   {
     q: "What's the meaning of life, the universe, and everything?",
     options: ["39", "40", "42", "Love"],
     answer: 2,
-    fact: "42. You've got 3 more years to figure it all out. 🌌"
+    fact: "42. You've got 3 more years to figure it all out. \ud83c\udf0c"
   }
 ];
 
@@ -358,6 +395,7 @@ let score = 0;
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 function startQuiz() {
@@ -374,6 +412,8 @@ function renderQuestion() {
   document.getElementById('question-text').textContent = q.q;
   document.getElementById('feedback').style.display = 'none';
   document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('question-media').style.display = 'none';
+  document.getElementById('question-media').innerHTML = '';
 
   const optionsEl = document.getElementById('options');
   optionsEl.innerHTML = '';
@@ -404,6 +444,17 @@ function selectAnswer(index) {
   feedback.className = 'feedback ' + (isCorrect ? 'correct-feedback' : 'wrong-feedback');
   feedback.style.display = 'block';
 
+  // Show media if this question has one
+  if (q.media) {
+    const mediaEl = document.getElementById('question-media');
+    if (q.media.type === 'image') {
+      mediaEl.innerHTML = `<img src="${q.media.src}" alt="">`;
+    } else if (q.media.type === 'video') {
+      mediaEl.innerHTML = `<video src="${q.media.src}" controls playsinline preload="metadata"></video>`;
+    }
+    mediaEl.style.display = 'block';
+  }
+
   document.getElementById('next-btn').style.display = 'inline-block';
 }
 
@@ -418,10 +469,11 @@ function nextQuestion() {
 }
 
 function getScoreComment(s) {
-  if (s === 7) return `You got ${s}/7 — Perfect score! You absolute legend.`;
-  if (s >= 5) return `You got ${s}/7 — Not bad! You mostly know your stuff.`;
-  if (s >= 3) return `You got ${s}/7 — Could be worse... could be better.`;
-  return `You got ${s}/7 — Wow. Do you even know yourself, Owen?`;
+  const total = questions.length;
+  if (s === total) return `You got ${s}/${total} \u2014 Perfect score! You absolute legend.`;
+  if (s >= 6) return `You got ${s}/${total} \u2014 Not bad! You mostly know your stuff.`;
+  if (s >= 4) return `You got ${s}/${total} \u2014 Could be worse... could be better.`;
+  return `You got ${s}/${total} \u2014 Wow. Do you even know yourself, Owen?`;
 }
 
 function showReveal() {
